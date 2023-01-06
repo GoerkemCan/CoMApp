@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-import lxml
+from datetime import datetime, timedelta
 
 
 # defs
@@ -11,12 +11,11 @@ def parse(filename):
     root = tree.getroot()
     
     
-def task_find(filename):
+def task_find():
     
     tasks = root[-3]   
     temp = []
     temp2 = []
-    global found
     
     word = word_find(sentence)
     
@@ -30,24 +29,25 @@ def task_find(filename):
             
             temp2.append(n.text)
             if n.text == word:
-                print(n.text)
                 z2 = temp2.index(n.text) % 43
-                
-                print(z1, z2) # root[-3][z1][z2] gives out where the assignment name is located
-                print(root[-3][z1][z2].text)
+                # root[-3][z1][z2] gives out where the assignment name is located
                 
                 found = root[-3][z1][z2]
                 
-                return found
+                return z1, z2
+         
             
 
 def changer():
     flag = sieve(sentence)
-       
+    z1, z2 = task_find()
+    
+    found = root[-3][z1][z2]
+    
     change = found.text + " Completed"
     
     if flag == "completed":
-            found.text = change
+        found.text = change
         
     
     
@@ -80,17 +80,31 @@ def word_find(sentence):
         title = sentence.title()
     
         word = title.replace("Assignment Completed: ", "")
-        print(word)
         
         return word
 
 
         
 def write(new):
-    tree.write(new)
-
-
-
+    tree.write(new)    
+    
+def add_time( days=0, months=0, years=0):
+  
+    z1, z2 = task_find()
+    print(z1)
+    print(z2)
+    date_string = root[-3][z1][11].text
+  
+    # Convert the date string to a datetime object
+    date = datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S")
+  
+    # Add the specified number of days, months, and years to the date
+    date = date + timedelta(days=days)
+    date = date.replace(year=date.year + years)
+    date = date.replace(month=date.month + months)
+  
+    # Return the modified datetime object as a formatted string
+    return date.strftime("%Y-%m-%dT%H:%M:%S")
 
 
 
@@ -101,7 +115,7 @@ new = "new1.xml"
 
 
 parse(filename) 
-task_find(filename)
+task_find()
 changer()
 write(new)
-
+add_time( days=2, months=3, years=1)
