@@ -1,1 +1,1 @@
-# CoMApp READ ME will added soon
+# CoMApp READ ME will be added soon
